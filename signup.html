@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - ModHubLTE</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">ModHub<span>LTE</span></div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="auth-container">
+        <div class="auth-form">
+            <h2>Join ModHubLTE</h2>
+            <p style="text-align: center; margin-bottom: 1rem; color: #a29bfe;">Create your account</p>
+            
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" name="fullName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required minlength="6">
+                </div>
+
+                <div class="form-group">
+                    <label for="userType">I want to sign up as:</label>
+                    <select id="userType" name="userType" required>
+                        <option value="">Select account type</option>
+                        <option value="user">User (Download apps & videos)</option>
+                        <option value="developer">Developer (Upload content)</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn">Create Account</button>
+            </form>
+            
+            <p class="role-note">If not developer or moderator, sign up as a user</p>
+            
+            <p style="text-align: center; margin-top: 1.5rem;">
+                Already have an account? <a href="login.html" style="color: #a29bfe;">Login here</a>
+            </p>
+            
+            <div id="message" style="margin-top: 1rem; text-align: center;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Replace with your actual Supabase credentials
+        const SUPABASE_URL = 'https://wqkejzehbhsvgzcfbecc.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indxa2VqemVoYmhzdmd6Y2ZiZWNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg5NjY0NTEsImV4cCI6MjA3NDU';
+        
+        // Initialize Supabase
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // Signup form handler
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const userType = document.getElementById('userType').value;
+            const messageDiv = document.getElementById('message');
+            
+            if (!userType) {
+                messageDiv.innerHTML = '<p style="color: #ff6b6b;">Please select account type</p>';
+                return;
+            }
+            
+            try {
+                // Sign up user with Supabase Auth
+                const { data: authData, error: authError } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                });
+                
+                if (authError) throw authError;
+
+                // Add user to our users table
+                const { data: userData, error: userError } = await supabase
+                    .from('users')
+                    .insert([
+                        { 
+                            email: email, 
+                            name: fullName, 
+                            role: userType 
+                        }
+                    ]);
+
+                if (userError) throw userError;
+
+                messageDiv.innerHTML = '<p style="color: #00b894;">Account created successfully! Redirecting to login...</p>';
+                
+                // Redirect to login after 2 seconds
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+                
+            } catch (error) {
+                messageDiv.innerHTML = `<p style="color: #ff6b6b;">Error: ${error.message}</p>`;
+            }
+        });
+
+        // Check if user is already logged in
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session) {
+                window.location.href = 'dashboard.html';
+            }
+        });
+    </script>
+</body>
+</html>        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // Signup form handler
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const userType = document.getElementById('userType').value;
+            const messageDiv = document.getElementById('message');
+            
+            if (!userType) {
+                messageDiv.innerHTML = '<p style="color: #ff6b6b;">Please select account type</p>';
+                return;
+            }
+            
+            try {
+                // Sign up user with Supabase Auth
+                const { data: authData, error: authError } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                });
+                
+                if (authError) throw authError;
+
+                // Add user to our users table
+                const { data: userData, error: userError } = await supabase
+                    .from('users')
+                    .insert([
+                        { 
+                            email: email, 
+                            name: fullName, 
+                            role: userType 
+                        }
+                    ]);
+
+                if (userError) throw userError;
+
+                messageDiv.innerHTML = '<p style="color: #00b894;">Account created successfully! Redirecting to login...</p>';
+                
+                // Redirect to login after 2 seconds
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+                
+            } catch (error) {
+                messageDiv.innerHTML = `<p style="color: #ff6b6b;">Error: ${error.message}</p>`;
+            }
+        });
+
+        // Check if user is already logged in
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session) {
+                window.location.href = 'dashboard.html';
+            }
+        });
+    </script>
+</body>
+                      </html>
