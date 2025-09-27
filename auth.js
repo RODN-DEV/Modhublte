@@ -6,7 +6,7 @@ class AuthHelper {
     }
 
     init() {
-        const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
+        const SUPABASE_URL = 'https://wqkejzehbhsvgzcfbecc.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indxa2VqemVoYmhzdmd6Y2ZiZWNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg5NjY0NTEsImV4cCI6MjA3NDU';
         this.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     }
