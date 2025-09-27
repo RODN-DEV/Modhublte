@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - ModHubLTE</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .dashboard-header {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+        .user-welcome {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        .category-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.3s;
+        }
+        .category-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        .content-list {
+            margin-top: 1rem;
+        }
+        .content-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">ModHub<span>LTE</span></div>
+            <ul class="nav-links">
+                <li><a href="dashboard.html" class="active">Dashboard</a></li>
+                <li><a href="#" id="logoutBtn">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="dashboard">
+        <div class="container">
+            <div class="dashboard-header">
+                <div class="user-welcome">Welcome, <span id="userName">User</span>!</div>
+                <p>Access all modding resources in one place</p>
+            </div>
+
+            <div class="category-grid">
+                <a href="#mod-apps" class="category-card">
+                    <div style="font-size: 2rem; margin-bottom: 1rem;">📱</div>
+                    <h3>Mod Apps</h3>
+                    <p>Download modified applications for various purposes</p>
+                    <div class="content-list" id="modAppsList">
+                        <!-- Apps will load here -->
+                    </div>
+                </a>
+
+                <a href="#videos" class="category-card">
+                    <div style="font-size: 2rem; margin-bottom: 1rem;">🎥</div>
+                    <h3>Video Tutorials</h3>
+                    <p>Learn modding with step-by-step video guides</p>
+                    <div class="content-list" id="videosList">
+                        <!-- Videos will load here -->
+                    </div>
+                </a>
+
+                <a href="#tools" class="category-card">
+                    <div style="font-size: 2rem; margin-bottom: 1rem;">🛠️</div>
+                    <h3>Modding Tools</h3>
+                    <p>Essential tools for application modding</p>
+                    <div class="content-list" id="toolsList">
+                        <!-- Tools will load here -->
+                    </div>
+                </a>
+            </div>
+
+            <!-- Sample Content Sections -->
+            <div style="margin-top: 3rem;">
+                <h3>Recently Added Mod Apps</h3>
+                <div class="content-list">
+                    <div class="content-item">
+                        <div>
+                            <strong>WhatsApp Mod v2.1</strong>
+                        </div>
+                        <button class="btn" style="padding: 0.5rem 1rem;">Download</button>
+                    </div>
+                    <div class="content-item">
+                        <div>
+                            <strong>YouTube Premium Mod</strong>
+                        </div>
+                        <button class="btn" style="padding: 0.5rem 1rem;">Download</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2023 ModHubLTE. All rights reserved.</p>
+                <div class="contact-support">
+                    <a href="https://wa.me/+256745430208" target="_blank">📱 WhatsApp Support</a>
+                    <a href="https://t.me/v2_0x1" target="_blank">✈️ Telegram Support</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Replace with your actual Supabase credentials
+        const SUPABASE_URL = 'https://wqkejzehbhsvgzcfbecc.supabase.co;
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indxa2VqemVoYmhzdmd6Y2ZiZWNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg5NjY0NTEsImV4cCI6MjA3NDU';
+        
+        // Initialize Supabase
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Check authentication
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            if (!session) {
+                window.location.href = 'login.html';
+            } else {
+                // Load user data
+                loadUserData(session.user);
+            }
+        });
+
+        // Load user data
+        async function loadUserData(user) {
+            document.getElementById('userName').textContent = user.email;
+            
+            // You can load user-specific content here
+            try {
+                const { data: userData, error } = await supabase
+                    .from('users')
+                    .select('name, role')
+                    .eq('email', user.email)
+                    .single();
+                    
+                if (userData && userData.name) {
+                    document.getElementById('userName').textContent = userData.name;
+                }
+            } catch (error) {
+                console.log('Error loading user data:', error);
+            }
+        }
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await supabase.auth.signOut();
+            window.location.href = 'index.html';
+        });
+
+        // Load sample content (you'll replace this with real data from Supabase)
+        function loadSampleContent() {
+            // This is sample data - you'll replace with real Supabase data
+            const sampleApps = [
+                { name: 'WhatsApp Mod v2.1', downloads: '1.2K' },
+                { name: 'YouTube Premium Mod', downloads: '2.4K' }
+            ];
+            
+            const sampleVideos = [
+                { title: 'Basic Modding Tutorial', views: '5.3K' },
+                { title: 'Advanced APK Editing', views: '2.1K' }
+            ];
+            
+            const sampleTools = [
+                { name: 'APK Editor', downloads: '3.7K' },
+                { name: 'Signature Remover', downloads: '1.9K' }
+            ];
+        }
+
+        // Initialize content when page loads
+        document.addEventListener('DOMContentLoaded', loadSampleContent);
+    </script>
+</body>
+</html>
