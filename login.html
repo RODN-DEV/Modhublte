@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - ModHubLTE</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">ModHub<span>LTE</span></div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="login.html" class="active">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="auth-container">
+        <div class="auth-form">
+            <h2>Login to ModHubLTE</h2>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                
+                <button type="submit" class="btn" style="width: 100%;">Login</button>
+            </form>
+            
+            <div style="text-align: center; margin: 1rem 0;">
+                <p>Or</p>
+            </div>
+            
+            <button id="googleLogin" class="btn" style="width: 100%; background: #db4437;">
+                Continue with Google
+            </button>
+            
+            <p class="role-note" style="text-align: center; margin-top: 1rem; font-style: italic;">
+                If not developer or moderator, sign up as a user
+            </p>
+            
+            <p style="text-align: center; margin-top: 1.5rem;">
+                Don't have an account? <a href="signup.html" style="color: var(--secondary);">Sign up</a>
+            </p>
+            
+            <div id="message" style="margin-top: 1rem; text-align: center;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Replace with your actual Supabase credentials
+        const SUPABASE_URL = 'https://wqkejzehbhsvgzcfbecc.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indxa2VqemVoYmhzdmd6Y2ZiZWNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg5NjY0NTEsImV4cCI6MjA3NDU0MjQ1MX0.jn5ubpQelGbFo9aKmWNVloZOCvGnrEzzt5jecXBLBf8';
+        
+        // Initialize Supabase
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // Login form handler
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const messageDiv = document.getElementById('message');
+            
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+                
+                if (error) throw error;
+                
+                // Check if user is admin
+                if (email === 'rapturetechrodney@gmail.com') {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
+                
+            } catch (error) {
+                messageDiv.innerHTML = `<p style="color: #ff6b6b;">Error: ${error.message}</p>`;
+            }
+        });
+        
+        // Google login
+        document.getElementById('googleLogin').addEventListener('click', async () => {
+            const { data, error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+            });
+        });
+        
+        // Check if user is already logged in
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session) {
+                if (session.user.email === 'rapturetechrodney@gmail.com') {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
+            }
+        });
+    </script>
+</body>
+  </html>
